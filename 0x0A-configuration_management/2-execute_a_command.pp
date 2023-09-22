@@ -1,5 +1,5 @@
-#this code kills a process && works together with the killmenow file which has already been provided
+# Puppet script that kills a process named killmeow
 exec { 'killmenow':
-  command   =>  'pkill killmenow',
-  provider  =>  'shell'
+  command  => 'pkill killmenow',
+  provider => 'shell'
 }
