@@ -1,9 +1,35 @@
 #!/usr/bin/env bash
-# performs a permanent (301) redirection of /redirect_me
+# Install and configure Nginx
 
-sudo apt-get -y update
+# Update package lists
+sudo apt-get update
+
+# Install Nginx
 sudo apt-get -y install nginx
-echo 'Hello World!' > /var/www/html/index.nginx-debian.html
-replacement="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4 permanent;"
-sudo sed -i "s/server_name _;/$replacement/" /etc/nginx/sites-available/default
+
+# Allow HTTP traffic through the firewall
+sudo ufw allow 'Nginx Full'
+
+# Create a simple "Hello World!" index page
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+#redirection
+printf %s "server {
+        listen 80;
+        listen [::]:80 default_server;
+        root   /var/www/html;
+        index  index.html index.htm;
+
+        location /redirect_me {
+                return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+        }
+
+        error_page 404 /404.html;
+        location /404 {
+                root /var/www/html;
+                internal;
+                }
+}" > /etc/nginx/sites-available/default
+
+# Restart Nginx to apply changes
 sudo service nginx restart
