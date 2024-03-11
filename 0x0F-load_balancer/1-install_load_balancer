@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Installs and configures HAProxy
+
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository -y ppa:vbernat/haproxy-2.0
+sudo apt-get -y update
+sudo apt-get install -y haproxy=2.0.\*
+
+# Enabling init script
+sudo echo "ENABLED=1" > /etc/default/haproxy
+
+# Creating a copy of HAProxy's config file
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
+
+# configuring to load balance web1 and web2 servers
+echo "
+	frontend myfrontend
+		bind *:80
+		option httpclose
+		option httplog
+		option forwardfor
+		default_backend mybackend
+	backend mybackend
+		mode http
+		balance roundrobin
+		server 69177-web-01 52.72.66.208:80 check
+		server 69177-web-02 35.175.64.229:80 check
+" >> /etc/haproxy/haproxy.cfg
+
+sudo service haproxy start
