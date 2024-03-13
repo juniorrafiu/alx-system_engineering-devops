@@ -1,35 +1,9 @@
 #!/usr/bin/env bash
-# Install and configure Nginx
+#redirections
+str_red="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4 permanent;"
 
-# Update package lists
-sudo apt-get update
-
-# Install Nginx
+sudo apt-get -y update
 sudo apt-get -y install nginx
-
-# Allow HTTP traffic through the firewall
-sudo ufw allow 'Nginx Full'
-
-# Create a simple "Hello World!" index page
 echo "Hello World!" | sudo tee /var/www/html/index.html
-
-#redirection
-printf %s "server {
-        listen 80;
-        listen [::]:80 default_server;
-        root   /var/www/html;
-        index  index.html index.htm;
-
-        location /redirect_me {
-                return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-        }
-
-        error_page 404 /404.html;
-        location /404 {
-                root /var/www/html;
-                internal;
-                }
-}" > /etc/nginx/sites-available/default
-
-# Restart Nginx to apply changes
+sudo sed -i "s/server_name _;/$str_red/" /etc/nginx/sites-enabled/default
 sudo service nginx restart
